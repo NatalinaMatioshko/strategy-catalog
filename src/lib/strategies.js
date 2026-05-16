@@ -1,6 +1,6 @@
 import catalog from '../data/strategiesCatalog.json'
 
-const strategyModules = import.meta.glob('../data/strategies/*.json')
+const unitModules = import.meta.glob('../data/administrative_units/*.json')
 
 export function getCities() {
   const cities = [...new Set(catalog.map((item) => item.city))]
@@ -16,11 +16,30 @@ export function getStrategiesByCity(city) {
   return catalog.filter((item) => item.city === city)
 }
 
-export async function loadStrategyBody(dataFile) {
-  const loader = strategyModules[`../data/strategies/${dataFile}.json`]
+export async function loadAdministrativeUnit(unitDataFile) {
+  const loader = unitModules[`../data/administrative_units/${unitDataFile}.json`]
   if (!loader) {
-    throw new Error(`Strategy file not found: ${dataFile}`)
+    throw new Error(`Administrative unit file not found: ${unitDataFile}`)
   }
   const module = await loader()
   return module.default
+}
+
+export function getStrategyFromUnit(unitPayload, strategyId) {
+  const unit = unitPayload?.administrative_unit
+  if (!unit?.strategies) return null
+  return unit.strategies.find((s) => s.id === strategyId) ?? null
+}
+
+/** @param {{ unitDataFile: string, strategyId: string }} catalogEntry */
+export async function loadStrategyForCatalogEntry(catalogEntry) {
+  const unitPayload = await loadAdministrativeUnit(catalogEntry.unitDataFile)
+  const strategy = getStrategyFromUnit(unitPayload, catalogEntry.strategyId)
+  if (!strategy) {
+    throw new Error(`Strategy not found: ${catalogEntry.strategyId}`)
+  }
+  return {
+    unit: unitPayload.administrative_unit,
+    strategy,
+  }
 }

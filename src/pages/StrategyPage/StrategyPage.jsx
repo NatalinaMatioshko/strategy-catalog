@@ -4,65 +4,33 @@ import CollapsibleBlock from '../../components/CollapsibleBlock/CollapsibleBlock
 import { Container } from '../../components/layout/Container.jsx'
 import {
   getCatalogEntryById,
-  loadStrategyBody,
+  loadStrategyForCatalogEntry,
 } from '../../lib/strategies.js'
 import './StrategyPage.css'
 
-function StrategyContent({ strategyData }) {
+function StrategyContent({ strategy }) {
   return (
     <>
-      {strategyData.strategicGoals.map((strategicGoal) => (
+      {strategy.strategic_goals.map((strategicGoal) => (
         <CollapsibleBlock
-          key={strategicGoal.code}
-          title={`Стратегічна ціль ${strategicGoal.code}. ${strategicGoal.title}`}
+          key={strategicGoal.id}
+          title={`Стратегічна ціль ${strategicGoal.label}. ${strategicGoal.title}`}
           defaultOpen={false}
         >
-          <p className="strategy-page__description">{strategicGoal.description}</p>
-
-          {strategicGoal.operationalGoals.map((operationalGoal) => (
+          {strategicGoal.operational_goals.map((operationalGoal) => (
             <div
-              key={operationalGoal.code}
+              key={operationalGoal.id}
               className="strategy-page__operational-goal"
             >
               <CollapsibleBlock
-                title={`Оперативна ціль ${operationalGoal.code}. ${operationalGoal.title}`}
+                title={`Оперативна ціль ${operationalGoal.label}. ${operationalGoal.title}`}
               >
                 {operationalGoal.tasks.map((task) => (
-                  <div key={task.code} className="strategy-page__task">
-                    <CollapsibleBlock
-                      title={`Завдання ${task.code}. ${task.title}`}
-                    >
-                      <div className="strategy-page__task-body">
-                        <p>
-                          <strong>Опис:</strong> {task.description}
-                        </p>
-                        <div className="strategy-page__task-meta">
-                          <p>
-                            <strong>Термін:</strong> {task.implementationPeriod}
-                          </p>
-                          <p>
-                            <strong>Статус:</strong>{' '}
-                            <span className="strategy-page__status">{task.status}</span>
-                          </p>
-                        </div>
-                        <p>
-                          <strong>Джерела фінансування:</strong> {task.financingSource}
-                        </p>
-                        <p>
-                          <strong>Відповідальні:</strong>{' '}
-                          {task.responsibleUnits.join(', ')}
-                        </p>
-                        {task.activities?.length > 0 && (
-                          <div className="strategy-page__activities">
-                            <strong>Заходи:</strong>
-                            <ul className="strategy-page__activities-list">
-                              {task.activities.map((activity) => (
-                                <li key={activity}>{activity}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
+                  <div key={task.id} className="strategy-page__task">
+                    <CollapsibleBlock title={`Завдання ${task.label}`}>
+                      <p className="strategy-page__task-description">
+                        {task.description}
+                      </p>
                     </CollapsibleBlock>
                   </div>
                 ))}
@@ -79,7 +47,7 @@ export function StrategyPage() {
   const { id } = useParams()
   const catalogEntry = getCatalogEntryById(id ?? '')
 
-  const [strategyData, setStrategyData] = useState(null)
+  const [loaded, setLoaded] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -93,9 +61,9 @@ export function StrategyPage() {
     setLoading(true)
     setError(null)
 
-    loadStrategyBody(catalogEntry.dataFile)
+    loadStrategyForCatalogEntry(catalogEntry)
       .then((data) => {
-        if (!cancelled) setStrategyData(data)
+        if (!cancelled) setLoaded(data)
       })
       .catch((err) => {
         if (!cancelled) setError(err.message)
@@ -128,6 +96,9 @@ export function StrategyPage() {
   const fileDisabled = !fileLink || fileLink === '#'
   const sourceDisabled = !sourceLink || sourceLink === '#'
 
+  const strategy = loaded?.strategy
+  const unitName = loaded?.unit?.name
+
   return (
     <main className="strategy-page">
       <Container>
@@ -137,11 +108,14 @@ export function StrategyPage() {
 
         <header className="strategy-page__header">
           <p className="strategy-page__city">{catalogEntry.city}</p>
+          {unitName && (
+            <p className="strategy-page__unit muted">{unitName}</p>
+          )}
           <h1 className="strategy-page__title">
-            {strategyData?.strategy?.name ?? catalogEntry.title}
+            {strategy?.title ?? catalogEntry.title}
           </h1>
-          {strategyData?.strategy?.vision && (
-            <p className="strategy-page__vision">{strategyData.strategy.vision}</p>
+          {catalogEntry.period && (
+            <p className="strategy-page__period muted">Період: {catalogEntry.period}</p>
           )}
         </header>
 
@@ -181,7 +155,7 @@ export function StrategyPage() {
 
         {loading && <p className="muted">Завантаження стратегії…</p>}
         {error && <p className="strategy-page__error">{error}</p>}
-        {strategyData && <StrategyContent strategyData={strategyData} />}
+        {strategy && <StrategyContent strategy={strategy} />}
       </Container>
     </main>
   )
