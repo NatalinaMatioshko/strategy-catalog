@@ -2,9 +2,37 @@ import catalog from '../data/strategiesCatalog.json'
 
 const unitModules = import.meta.glob('../data/administrative_units/*.json')
 
+function normalize(value) {
+  return value.trim().toLowerCase()
+}
+
 export function getCities() {
   const cities = [...new Set(catalog.map((item) => item.city))]
   return cities.sort((a, b) => a.localeCompare(b, 'uk'))
+}
+
+export function getDirections() {
+  const all = catalog.flatMap((item) => item.directions ?? [])
+  return [...new Set(all)].sort((a, b) => a.localeCompare(b, 'uk'))
+}
+
+export function searchStrategies(query) {
+  const q = normalize(query)
+  if (!q) return []
+
+  return catalog.filter((item) => {
+    const haystack = [
+      item.city,
+      item.title,
+      item.summary,
+      item.period,
+      ...(item.directions ?? []),
+    ]
+      .join(' ')
+      .toLowerCase()
+
+    return haystack.includes(q)
+  })
 }
 
 export function getCatalogEntryById(id) {
@@ -31,7 +59,6 @@ export function getStrategyFromUnit(unitPayload, strategyId) {
   return unit.strategies.find((s) => s.id === strategyId) ?? null
 }
 
-/** @param {{ unitDataFile: string, strategyId: string }} catalogEntry */
 export async function loadStrategyForCatalogEntry(catalogEntry) {
   const unitPayload = await loadAdministrativeUnit(catalogEntry.unitDataFile)
   const strategy = getStrategyFromUnit(unitPayload, catalogEntry.strategyId)

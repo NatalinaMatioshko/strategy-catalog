@@ -6,7 +6,7 @@ export function Header() {
     <header className="site-header">
       <Container className="site-header__inner">
         <Link className="brand" to="/">
-          Є рішення
+          Є <span>рішення</span>
         </Link>
         <nav className="site-nav" aria-label="Головна навігація">
           <NavLink className="site-nav__link" to="/" end>
