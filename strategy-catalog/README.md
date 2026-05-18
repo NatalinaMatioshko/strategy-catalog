@@ -1,73 +1,121 @@
-# React + TypeScript + Vite
+# Strategy Catalog Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for the strategy catalog MVP.
 
-Currently, two official plugins are available:
+This project is being built to display long-term strategic documents in a structured and удобний format: strategy → strategic goals → operational goals → tasks.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech stack
 
-## React Compiler
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Project status
 
-## Expanding the ESLint configuration
+The project is in active MVP development.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Current focus:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- base frontend scaffold
+- strategy detail page
+- integration with backend API
+- rendering hierarchical strategy structure
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Getting started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Install dependencies
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Run locally
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm run dev
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Build project
+
+```bash
+npm run build
+```
+
+### Preview production build
+
+```bash
+npm run preview
+```
+
+## Project structure
+
+```txt
+src/
+├─ components/
+├─ pages/
+├─ services/
+├─ types/
+├─ mocks/
+├─ utils/
+├─ App.tsx
+├─ main.tsx
+└─ index.css
+```
+
+## Main pages
+
+- `HomePage` — entry page
+- `StrategiesPage` — list of strategies
+- `StrategyDetailPage` — full strategy structure page
+
+## Data flow
+
+Frontend is designed to work with:
+
+- mock data during early development
+- backend API for real strategy structure
+
+Main expected response shape:
+
+- strategy
+- strategicGoals
+- operationalGoals
+- tasks
+
+## Related documentation
+
+- Backend API documentation — see Confluence
+- Project notes and specifications — see Confluence / team chat
+
+## Development notes
+
+- Keep components small and reusable
+- Keep business logic in `services/`
+- Keep shared interfaces in `types/`
+- Use `mocks/` for temporary local data
+- Avoid large page components with mixed logic
+
+## Team workflow
+
+Before starting a new feature:
+
+1. Pull the latest changes from the repository.
+2. Create a separate branch for your task.
+3. Implement the feature in small, focused commits.
+4. Run lint and check that the project starts locally.
+5. Open a pull request for review before merging.
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run lint
 ```
